@@ -3,7 +3,7 @@ import { CustomerController } from "./customer.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/role.middleware";
 import { validate } from "../middleware/validate.middleware";
-import { createCustomerSchema } from "./customer.validation";
+import { createCustomerSchema,updateCustomerSchema,} from "./customer.validation";
 
 const router = Router();
 const controller = new CustomerController();
@@ -22,6 +22,14 @@ router.get(
   authenticate,
   authorize("ADMIN", "SALES"),
   controller.findById
+);
+
+router.put(
+  "/:id",
+  authenticate,
+  authorize("ADMIN", "SALES"),
+  validate(updateCustomerSchema),
+  controller.update
 );
 
 // Create customer

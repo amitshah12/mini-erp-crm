@@ -2,6 +2,7 @@ import { prisma } from "../config/prisma";
 import { CreateCustomerInput } from "./customer.validation";
 import { Prisma } from "@prisma/client";
 import { ListCustomersInput } from "./customer.validation";
+import { UpdateCustomerInput } from "./customer.validation";
 
 export class CustomerRepository {
   async create(data: CreateCustomerInput) {
@@ -88,5 +89,14 @@ export class CustomerRepository {
       customers,
       total,
     };
+  }
+
+  async update(id: string, data: UpdateCustomerInput) {
+    return prisma.customer.update({
+      where: {
+        id,
+      },
+      data,
+    });
   }
 }

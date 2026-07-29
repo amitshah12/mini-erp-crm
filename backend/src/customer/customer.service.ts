@@ -3,6 +3,7 @@ import { CustomerRepository } from "./customer.repository";
 import { CreateCustomerInput } from "./customer.validation";
 import { ListCustomersInput } from "./customer.validation";
 import { CustomerIdInput } from "./customer.validation";
+import { UpdateCustomerInput } from "./customer.validation";
 
 export class CustomerService {
   private repository = new CustomerRepository();
@@ -33,4 +34,29 @@ export class CustomerService {
 
     return customer;
   }
+
+  async update(
+    id: string,
+    data: UpdateCustomerInput
+  ) {
+    const customer = await this.repository.findById(id);
+
+    if (!customer) {
+      throw new ApiError(404, "Customer not found");
+    }
+
+    if (data.email && data.email !== customer.email) {
+      const existing = await this.repository.findByEmail(data.email);
+
+      if (existing) {
+        throw new ApiError(
+          409,
+          "Customer with this email already exists"
+        );
+      }
+    }
+
+    return this.repository.update(id, data);
+  }
 }
+

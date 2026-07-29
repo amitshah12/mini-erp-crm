@@ -46,5 +46,10 @@ export const customerIdSchema = z.object({
   id: z.string().min(1),
 });
 
+export const updateCustomerSchema = createCustomerSchema.partial();
+
+export type UpdateCustomerInput =
+  z.infer<typeof updateCustomerSchema>;
+
 export type CustomerIdInput =
   z.infer<typeof customerIdSchema>;

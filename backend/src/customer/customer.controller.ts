@@ -44,4 +44,20 @@ export class CustomerController {
       )
     );
   };
+
+  update = async (req: Request, res: Response) => {
+    const { id } = customerIdSchema.parse(req.params);
+
+    const updatedCustomer = await this.service.update(
+      id,
+      req.body
+    );
+
+    return res.json(
+      ApiResponse.success(
+        "Customer updated successfully",
+        updatedCustomer
+      )
+    );
+  };
 }
