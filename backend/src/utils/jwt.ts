@@ -1,18 +1,23 @@
-import jwt from "jsonwebtoken";
+import jwt, { Secret, SignOptions } from "jsonwebtoken";
+import { Role } from "@prisma/client";
 
-const JWT_SECRET =
-  process.env.JWT_SECRET ||
-  "mini-erp-crm-super-secret-key";
+export interface JwtPayload {
+  id: string;
+  role: Role;
+}
 
-const JWT_EXPIRES_IN =
-  process.env.JWT_EXPIRES_IN || "7d";
+const JWT_SECRET: Secret =
+  process.env.JWT_SECRET || "mini-erp-crm-super-secret-key";
 
-export function generateToken(payload: object) {
+const JWT_EXPIRES_IN: SignOptions["expiresIn"] =
+  (process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"]) || "7d";
+
+export function generateToken(payload: JwtPayload): string {
   return jwt.sign(payload, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
   });
 }
 
-export function verifyToken(token: string) {
-  return jwt.verify(token, JWT_SECRET);
+export function verifyToken(token: string): JwtPayload {
+  return jwt.verify(token, JWT_SECRET) as JwtPayload;
 }
