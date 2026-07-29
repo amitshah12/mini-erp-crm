@@ -20,9 +20,10 @@ export class CustomerRepository {
   }
 
   async findById(id: string) {
-    return prisma.customer.findUnique({
+    return prisma.customer.findFirst({
       where: {
         id,
+        isDeleted: false,
       },
     });
   }
@@ -37,6 +38,8 @@ export class CustomerRepository {
     } = filters;
 
     const where: Prisma.CustomerWhereInput = {};
+
+    where.isDeleted = false;
 
     if (search) {
       where.OR = [
@@ -97,6 +100,17 @@ export class CustomerRepository {
         id,
       },
       data,
+    });
+  }
+
+  async softDelete(id: string) {
+    return prisma.customer.update({
+      where: {
+        id,
+      },
+      data: {
+        isDeleted: true,
+      },
     });
   }
 }

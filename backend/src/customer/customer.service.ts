@@ -58,5 +58,15 @@ export class CustomerService {
 
     return this.repository.update(id, data);
   }
+
+  async softDelete(id: string) {
+    const customer = await this.repository.findById(id);
+
+    if (!customer) {
+      throw new ApiError(404, "Customer not found");
+    }
+
+    return this.repository.softDelete(id);
+  }
 }
 

@@ -32,6 +32,13 @@ router.put(
   controller.update
 );
 
+router.delete(
+  "/:id",
+  authenticate,
+  authorize("ADMIN"),
+  controller.softDelete
+);
+
 // Create customer
 router.post(
   "/",

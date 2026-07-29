@@ -60,4 +60,16 @@ export class CustomerController {
       )
     );
   };
+
+  softDelete = async (req: Request, res: Response) => {
+    const { id } = customerIdSchema.parse(req.params);
+
+    await this.service.softDelete(id);
+
+    return res.json(
+      ApiResponse.success(
+        "Customer deleted successfully"
+      )
+    );
+  };
 }
