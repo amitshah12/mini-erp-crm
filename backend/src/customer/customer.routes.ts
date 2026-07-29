@@ -8,6 +8,7 @@ import { createCustomerSchema } from "./customer.validation";
 const router = Router();
 const controller = new CustomerController();
 
+// List all customers
 router.get(
   "/",
   authenticate,
@@ -15,6 +16,15 @@ router.get(
   controller.findAll
 );
 
+// Get customer by ID
+router.get(
+  "/:id",
+  authenticate,
+  authorize("ADMIN", "SALES"),
+  controller.findById
+);
+
+// Create customer
 router.post(
   "/",
   authenticate,

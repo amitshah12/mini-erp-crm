@@ -41,3 +41,10 @@ export const listCustomersSchema = z.object({
 
 export type ListCustomersInput =
   z.infer<typeof listCustomersSchema>;
+
+export const customerIdSchema = z.object({
+  id: z.string().min(1),
+});
+
+export type CustomerIdInput =
+  z.infer<typeof customerIdSchema>;

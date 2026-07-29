@@ -2,6 +2,7 @@ import { ApiError } from "../utils/ApiError";
 import { CustomerRepository } from "./customer.repository";
 import { CreateCustomerInput } from "./customer.validation";
 import { ListCustomersInput } from "./customer.validation";
+import { CustomerIdInput } from "./customer.validation";
 
 export class CustomerService {
   private repository = new CustomerRepository();
@@ -21,5 +22,15 @@ export class CustomerService {
 
   async findAll(filters: ListCustomersInput) {
     return this.repository.findAll(filters);
+  }
+
+  async findById({ id }: CustomerIdInput) {
+    const customer = await this.repository.findById(id);
+
+    if (!customer) {
+      throw new ApiError(404, "Customer not found");
+    }
+
+    return customer;
   }
 }
