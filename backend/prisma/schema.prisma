@@ -7,6 +7,110 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  password  String
+  role      Role
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  challans  Challan[]
+  stockLogs StockLog[]
+}
+
+model Customer {
+  id           String         @id @default(cuid())
+  name         String
+  mobile       String
+  email        String?
+  businessName String
+  gstNumber    String?
+  customerType CustomerType
+  status       CustomerStatus
+  address      String
+  followUpDate DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  isDeleted    Boolean        @default(false)
+  challans     Challan[]
+  notes        CustomerNote[]
+}
+
+model Product {
+  id             String   @id @default(cuid())
+
+  name           String
+  sku            String   @unique
+  barcode        String?  @unique
+
+  category       ProductCategory
+  brand          String
+
+  unit           Unit
+
+  purchasePrice  Float
+  sellingPrice   Float
+
+  currentStock   Int      @default(0)
+  minimumStock   Int      @default(0)
+
+  description    String?
+
+  isDeleted      Boolean  @default(false)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  stockLogs      StockLog[]
+  challanItems   ChallanItem[]
+}
+
+model CustomerNote {
+  id         String   @id @default(cuid())
+  note       String
+  customerId String
+  createdAt  DateTime @default(now())
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model StockLog {
+  id          String       @id @default(cuid())
+  quantity    Int
+  movement    MovementType
+  reason      String
+  createdAt   DateTime     @default(now())
+  productId   String
+  createdById String
+  createdBy   User         @relation(fields: [createdById], references: [id])
+  product     Product      @relation(fields: [productId], references: [id])
+}
+
+model Challan {
+  id            String        @id @default(cuid())
+  challanNumber String        @unique
+  totalQuantity Int
+  status        ChallanStatus
+  createdAt     DateTime      @default(now())
+  customerId    String
+  createdById   String
+  createdBy     User          @relation(fields: [createdById], references: [id])
+  customer      Customer      @relation(fields: [customerId], references: [id])
+  items         ChallanItem[]
+}
+
+model ChallanItem {
+  id          String  @id @default(cuid())
+  quantity    Int
+  productName String
+  sku         String
+  unitPrice   Float
+  productId   String
+  challanId   String
+  challan     Challan @relation(fields: [challanId], references: [id], onDelete: Cascade)
+  product     Product @relation(fields: [productId], references: [id])
+}
+
 enum Role {
   ADMIN
   SALES
@@ -37,139 +141,18 @@ enum ChallanStatus {
   CANCELLED
 }
 
-model User {
-  id       String @id @default(cuid())
-  name     String
-  email    String @unique
-  password String
-  role     Role
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  stockLogs StockLog[]
-  challans  Challan[]
+enum ProductCategory {
+  ELECTRONICS
+  GROCERY
+  STATIONERY
+  CLOTHING
+  MEDICAL
+  OTHER
 }
 
-model Customer {
-  id String @id @default(cuid())
-
-  name         String
-  mobile       String
-  email        String?
-  businessName String
-  gstNumber    String?
-
-  customerType CustomerType
-  status       CustomerStatus
-
-  address      String
-  followUpDate DateTime?
-
-  isDeleted Boolean @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  notes    CustomerNote[]
-  challans Challan[]
-}
-
-model CustomerNote {
-  id String @id @default(cuid())
-
-  note String
-
-  customerId String
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-}
-
-model Product {
-  id String @id @default(cuid())
-
-  sku String @unique
-
-  name String
-
-  category String
-
-  unitPrice Float
-
-  stock Int
-
-  minStock Int
-
-  warehouse String
-
-  createdAt DateTime @default(now())
-
-  updatedAt DateTime @updatedAt
-
-  stockLogs StockLog[]
-
-  challanItems ChallanItem[]
-}
-
-model StockLog {
-  id String @id @default(cuid())
-
-  quantity Int
-
-  movement MovementType
-
-  reason String
-
-  createdAt DateTime @default(now())
-
-  productId String
-
-  product Product @relation(fields: [productId], references: [id])
-
-  createdById String
-
-  createdBy User @relation(fields: [createdById], references: [id])
-}
-
-model Challan {
-  id String @id @default(cuid())
-
-  challanNumber String @unique
-
-  totalQuantity Int
-
-  status ChallanStatus
-
-  createdAt DateTime @default(now())
-
-  customerId String
-
-  customer Customer @relation(fields: [customerId], references: [id])
-
-  createdById String
-
-  createdBy User @relation(fields: [createdById], references: [id])
-
-  items ChallanItem[]
-}
-
-model ChallanItem {
-  id String @id @default(cuid())
-
-  quantity Int
-
-  productName String
-
-  sku String
-
-  unitPrice Float
-
-  productId String
-
-  product Product @relation(fields: [productId], references: [id])
-
-  challanId String
-
-  challan Challan @relation(fields: [challanId], references: [id], onDelete: Cascade)
+enum Unit {
+  PIECE
+  BOX
+  KG
+  LITER
 }
