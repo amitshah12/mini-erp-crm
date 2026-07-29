@@ -38,141 +38,136 @@ enum ChallanStatus {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  password     String
-  role         Role
+  id       String @id @default(cuid())
+  name     String
+  email    String @unique
+  password String
+  role     Role
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  stockLogs    StockLog[]
-  challans     Challan[]
+  stockLogs StockLog[]
+  challans  Challan[]
 }
 
 model Customer {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  name            String
-  mobile          String
-  email           String?
-  businessName    String
-  gstNumber       String?
+  name         String
+  mobile       String
+  email        String?
+  businessName String
+  gstNumber    String?
 
-  customerType    CustomerType
-  status          CustomerStatus
+  customerType CustomerType
+  status       CustomerStatus
 
-  address         String
-  followUpDate    DateTime?
+  address      String
+  followUpDate DateTime?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  notes           CustomerNote[]
-  challans        Challan[]
+  notes    CustomerNote[]
+  challans Challan[]
 }
 
 model CustomerNote {
-  id          String @id @default(cuid())
+  id String @id @default(cuid())
 
-  note        String
+  note String
 
-  customerId  String
-  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model Product {
+  id String @id @default(cuid())
 
-  id          String @id @default(cuid())
+  sku String @unique
 
-  sku         String @unique
+  name String
 
-  name        String
+  category String
 
-  category    String
+  unitPrice Float
 
-  unitPrice   Float
+  stock Int
 
-  stock       Int
+  minStock Int
 
-  minStock    Int
+  warehouse String
 
-  warehouse   String
+  createdAt DateTime @default(now())
 
-  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  updatedAt   DateTime @updatedAt
-
-  stockLogs   StockLog[]
+  stockLogs StockLog[]
 
   challanItems ChallanItem[]
 }
 
 model StockLog {
+  id String @id @default(cuid())
 
-  id          String @id @default(cuid())
+  quantity Int
 
-  quantity    Int
+  movement MovementType
 
-  movement    MovementType
+  reason String
 
-  reason      String
+  createdAt DateTime @default(now())
 
-  createdAt   DateTime @default(now())
+  productId String
 
-  productId   String
-
-  product     Product @relation(fields:[productId],references:[id])
+  product Product @relation(fields: [productId], references: [id])
 
   createdById String
 
-  createdBy   User @relation(fields:[createdById],references:[id])
-
+  createdBy User @relation(fields: [createdById], references: [id])
 }
 
 model Challan {
+  id String @id @default(cuid())
 
-  id              String @id @default(cuid())
+  challanNumber String @unique
 
-  challanNumber   String @unique
+  totalQuantity Int
 
-  totalQuantity   Int
+  status ChallanStatus
 
-  status          ChallanStatus
+  createdAt DateTime @default(now())
 
-  createdAt       DateTime @default(now())
+  customerId String
 
-  customerId      String
+  customer Customer @relation(fields: [customerId], references: [id])
 
-  customer        Customer @relation(fields:[customerId],references:[id])
+  createdById String
 
-  createdById     String
+  createdBy User @relation(fields: [createdById], references: [id])
 
-  createdBy       User @relation(fields:[createdById],references:[id])
-
-  items           ChallanItem[]
+  items ChallanItem[]
 }
 
 model ChallanItem {
+  id String @id @default(cuid())
 
-  id          String @id @default(cuid())
-
-  quantity    Int
+  quantity Int
 
   productName String
 
-  sku         String
+  sku String
 
-  unitPrice   Float
+  unitPrice Float
 
-  productId   String
+  productId String
 
-  product     Product @relation(fields:[productId],references:[id])
+  product Product @relation(fields: [productId], references: [id])
 
-  challanId   String
+  challanId String
 
-  challan     Challan @relation(fields:[challanId],references:[id],onDelete: Cascade)
+  challan Challan @relation(fields: [challanId], references: [id], onDelete: Cascade)
 }
