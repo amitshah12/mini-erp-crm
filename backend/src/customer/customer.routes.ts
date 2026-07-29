@@ -8,6 +8,13 @@ import { createCustomerSchema } from "./customer.validation";
 const router = Router();
 const controller = new CustomerController();
 
+router.get(
+  "/",
+  authenticate,
+  authorize("ADMIN", "SALES"),
+  controller.findAll
+);
+
 router.post(
   "/",
   authenticate,

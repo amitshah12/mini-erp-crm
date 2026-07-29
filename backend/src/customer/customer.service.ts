@@ -1,6 +1,7 @@
 import { ApiError } from "../utils/ApiError";
 import { CustomerRepository } from "./customer.repository";
 import { CreateCustomerInput } from "./customer.validation";
+import { ListCustomersInput } from "./customer.validation";
 
 export class CustomerService {
   private repository = new CustomerRepository();
@@ -16,5 +17,9 @@ export class CustomerService {
     }
 
     return this.repository.create(data);
+  }
+
+  async findAll(filters: ListCustomersInput) {
+    return this.repository.findAll(filters);
   }
 }
