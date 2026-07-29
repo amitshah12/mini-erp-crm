@@ -1,0 +1,110 @@
+import { MovementType } from "@prisma/client";
+import { prisma } from "../config/prisma";
+
+class DashboardRepository {
+  async getSummary() {
+    const [
+      totalCustomers,
+      totalProducts,
+      totalChallans,
+      totalInventoryItems,
+    ] = await prisma.$transaction([
+      prisma.customer.count({
+        where: {
+          isDeleted: false,
+        },
+      }),
+
+      prisma.product.count({
+        where: {
+          isDeleted: false,
+        },
+      }),
+
+      prisma.challan.count(),
+
+      prisma.product.aggregate({
+        _sum: {
+          currentStock: true,
+        },
+      }),
+    ]);
+
+    return {
+      totalCustomers,
+      totalProducts,
+      totalChallans,
+      totalInventoryItems:
+        totalInventoryItems._sum.currentStock ?? 0,
+    };
+  }
+
+  async getLowStockProducts() {
+    const products = await prisma.product.findMany({
+      where: {
+        isDeleted: false,
+      },
+      select: {
+        id: true,
+        name: true,
+        sku: true,
+        currentStock: true,
+        minimumStock: true,
+      },
+      orderBy: {
+        currentStock: "asc",
+      },
+    });
+
+    return products.filter(
+      (product) =>
+        product.currentStock <= product.minimumStock
+    );
+  }
+
+  async getRecentChallans(limit = 5) {
+    return prisma.challan.findMany({
+      take: limit,
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        customer: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getInventoryStats() {
+    const [stockIn, stockOut] = await prisma.$transaction([
+      prisma.stockLog.aggregate({
+        where: {
+          movement: MovementType.IN,
+        },
+        _sum: {
+          quantity: true,
+        },
+      }),
+
+      prisma.stockLog.aggregate({
+        where: {
+          movement: MovementType.OUT,
+        },
+        _sum: {
+          quantity: true,
+        },
+      }),
+    ]);
+
+    return {
+      stockIn: stockIn._sum.quantity ?? 0,
+      stockOut: stockOut._sum.quantity ?? 0,
+    };
+  }
+}
+
+export default new DashboardRepository();
