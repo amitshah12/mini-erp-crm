@@ -25,20 +25,31 @@ export class ProductController {
     };
 
     findAll = async (req: Request, res: Response) => {
-        const { page, limit, search, category } =
-            listProductsSchema.parse(req.query);
+        const filters = listProductsSchema.parse(req.query);
 
         const result = await this.service.findAll(
-            page,
-            limit,
-            search,
-            category
+            filters.page,
+            filters.limit,
+            filters.search,
+            filters.category
+        );
+
+        const totalPages = Math.ceil(
+            result.total / filters.limit
         );
 
         return res.json(
             ApiResponse.success(
                 "Products fetched successfully",
-                result
+                {
+                    items: result.products,
+                    pagination: {
+                        page: filters.page,
+                        limit: filters.limit,
+                        total: result.total,
+                        totalPages,
+                    },
+                }
             )
         );
     };

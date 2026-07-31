@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { ApiResponse } from "../utils/ApiResponse";
 import { CustomerService } from "./customer.service";
-import { listCustomersSchema } from "./customer.validation";
-import { customerIdSchema } from "./customer.validation"
+import {
+  customerIdSchema,
+  listCustomersSchema,
+} from "./customer.validation";
 
 export class CustomerController {
   private service = new CustomerService();
@@ -23,10 +25,22 @@ export class CustomerController {
 
     const result = await this.service.findAll(filters);
 
+    const totalPages = Math.ceil(
+      result.total / filters.limit
+    );
+
     return res.json(
       ApiResponse.success(
         "Customers fetched successfully",
-        result
+        {
+          items: result.customers,
+          pagination: {
+            page: filters.page,
+            limit: filters.limit,
+            total: result.total,
+            totalPages,
+          },
+        }
       )
     );
   };
@@ -34,8 +48,7 @@ export class CustomerController {
   findById = async (req: Request, res: Response) => {
     const params = customerIdSchema.parse(req.params);
 
-    const customer =
-      await this.service.findById(params);
+    const customer = await this.service.findById(params);
 
     return res.json(
       ApiResponse.success(

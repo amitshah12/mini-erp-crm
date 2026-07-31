@@ -2,9 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import challanService from "./challan.service";
 import { ApiResponse } from "../utils/ApiResponse";
 import {
-  listChallanSchema,
-  updateChallanStatusSchema,
-  challanIdParamSchema,
+    listChallanSchema,
+    updateChallanStatusSchema,
+    challanIdParamSchema,
 } from "./challan.validation";
 
 
@@ -39,12 +39,24 @@ export class ChallanController {
         try {
             const query = listChallanSchema.parse(req.query);
 
-            const challans = await challanService.findAll(query);
+            const result = await challanService.findAll(query);
+
+            const totalPages = Math.ceil(
+                result.total / query.limit
+            );
 
             res.json(
                 ApiResponse.success(
                     "Challans fetched successfully",
-                    challans
+                    {
+                        items: result.challans,
+                        pagination: {
+                            page: query.page,
+                            limit: query.limit,
+                            total: result.total,
+                            totalPages,
+                        },
+                    }
                 )
             );
         } catch (error) {
