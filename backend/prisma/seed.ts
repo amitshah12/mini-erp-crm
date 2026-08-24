@@ -6,6 +6,7 @@ import {
   ProductCategory,
   Unit,
 } from "@prisma/client";
+
 import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
@@ -23,7 +24,11 @@ async function main() {
     where: {
       email: "admin@minierp.com",
     },
-    update: {},
+    update: {
+      name: "System Administrator",
+      password,
+      role: Role.ADMIN,
+    },
     create: {
       name: "System Administrator",
       email: "admin@minierp.com",
@@ -36,7 +41,11 @@ async function main() {
     where: {
       email: "sales@minierp.com",
     },
-    update: {},
+    update: {
+      name: "Sales Executive",
+      password,
+      role: Role.SALES,
+    },
     create: {
       name: "Sales Executive",
       email: "sales@minierp.com",
@@ -49,7 +58,11 @@ async function main() {
     where: {
       email: "warehouse@minierp.com",
     },
-    update: {},
+    update: {
+      name: "Warehouse Manager",
+      password,
+      role: Role.WAREHOUSE,
+    },
     create: {
       name: "Warehouse Manager",
       email: "warehouse@minierp.com",
@@ -62,7 +75,11 @@ async function main() {
     where: {
       email: "accounts@minierp.com",
     },
-    update: {},
+    update: {
+      name: "Accounts Manager",
+      password,
+      role: Role.ACCOUNTS,
+    },
     create: {
       name: "Accounts Manager",
       email: "accounts@minierp.com",
@@ -84,7 +101,7 @@ async function main() {
   // Seed Customers
   // ----------------------------------------------------
 
-    const customers = [
+  const customers = [
     {
       name: "Rahul Sharma",
       mobile: "9876543210",
@@ -203,4 +220,100 @@ async function main() {
   // Seed Products
   // ----------------------------------------------------
 
-  
+  const products = [
+    {
+      sku: "LAP-001",
+      name: "Laptop Pro",
+      description: "High-performance business laptop",
+      category: ProductCategory.ELECTRONICS,
+      brand: "TechPro",
+      unit: Unit.PIECE,
+      purchasePrice: 50000,
+      sellingPrice: 65000,
+      currentStock: 10,
+      minimumStock: 3,
+    },
+    {
+      sku: "MON-001",
+      name: "LED Monitor",
+      description: "24-inch Full HD monitor",
+      category: ProductCategory.ELECTRONICS,
+      brand: "ViewTech",
+      unit: Unit.PIECE,
+      purchasePrice: 8000,
+      sellingPrice: 12000,
+      currentStock: 5,
+      minimumStock: 2,
+    },
+    {
+      sku: "KEY-001",
+      name: "Wireless Keyboard",
+      description: "Wireless office keyboard",
+      category: ProductCategory.ELECTRONICS,
+      brand: "KeyMaster",
+      unit: Unit.PIECE,
+      purchasePrice: 1500,
+      sellingPrice: 2200,
+      currentStock: 2,
+      minimumStock: 5,
+    },
+    {
+      sku: "PEN-001",
+      name: "Ball Pen Pack",
+      description: "Pack of 10 blue ball pens",
+      category: ProductCategory.STATIONERY,
+      brand: "WriteWell",
+      unit: Unit.PIECE,
+      purchasePrice: 100,
+      sellingPrice: 150,
+      currentStock: 50,
+      minimumStock: 10,
+    },
+    {
+      sku: "MED-001",
+      name: "First Aid Kit",
+      description: "Basic medical first aid kit",
+      category: ProductCategory.MEDICAL,
+      brand: "HealthSafe",
+      unit: Unit.PIECE,
+      purchasePrice: 500,
+      sellingPrice: 750,
+      currentStock: 3,
+      minimumStock: 5,
+    },
+  ];
+
+  for (const product of products) {
+    await prisma.product.upsert({
+      where: {
+        sku: product.sku,
+      },
+      update: product,
+      create: product,
+    });
+  }
+
+  console.log("✅ Products seeded");
+
+  console.log("\n🎉 Database seeding completed successfully.");
+
+  console.log("\nTest Accounts:");
+  console.log("ADMIN     : admin@minierp.com");
+  console.log("SALES     : sales@minierp.com");
+  console.log("WAREHOUSE : warehouse@minierp.com");
+  console.log("ACCOUNTS  : accounts@minierp.com");
+  console.log("Password  : Password@123\n");
+}
+
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (error) => {
+    console.error("❌ Database seeding failed:");
+    console.error(error);
+
+    await prisma.$disconnect();
+
+    process.exit(1);
+  });

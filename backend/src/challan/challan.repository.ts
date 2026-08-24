@@ -70,10 +70,30 @@ class ChallanRepository {
     async findAll(
         page: number,
         limit: number,
+        search?: string,
         customerId?: string,
         status?: ChallanStatus
     ) {
         const where: Prisma.ChallanWhereInput = {};
+
+        if (search) {
+            where.OR = [
+                {
+                    challanNumber: {
+                        contains: search,
+                        mode: "insensitive",
+                    },
+                },
+                {
+                    customer: {
+                        name: {
+                            contains: search,
+                            mode: "insensitive",
+                        },
+                    },
+                },
+            ];
+        }
 
         if (customerId) {
             where.customerId = customerId;

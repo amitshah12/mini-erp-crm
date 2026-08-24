@@ -8,6 +8,10 @@ class DashboardRepository {
       totalProducts,
       totalChallans,
       totalInventoryItems,
+      stockIn,
+      stockOut,
+      products,
+      recentChallans,
     ] = await prisma.$transaction([
       prisma.customer.count({
         where: {
@@ -24,18 +28,92 @@ class DashboardRepository {
       prisma.challan.count(),
 
       prisma.product.aggregate({
+        where: {
+          isDeleted: false,
+        },
         _sum: {
           currentStock: true,
         },
       }),
+
+      prisma.stockLog.aggregate({
+        where: {
+          movement: MovementType.IN,
+        },
+        _sum: {
+          quantity: true,
+        },
+      }),
+
+      prisma.stockLog.aggregate({
+        where: {
+          movement: MovementType.OUT,
+        },
+        _sum: {
+          quantity: true,
+        },
+      }),
+
+      prisma.product.findMany({
+        where: {
+          isDeleted: false,
+        },
+        select: {
+          id: true,
+          name: true,
+          sku: true,
+          currentStock: true,
+          minimumStock: true,
+        },
+        orderBy: {
+          currentStock: "asc",
+        },
+      }),
+
+      prisma.challan.findMany({
+        take: 5,
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          customer: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      }),
     ]);
 
+    const lowStockProducts = products
+      .filter(
+        (product) =>
+          product.currentStock <=
+          product.minimumStock
+      )
+      .slice(0, 5);
+
     return {
-      totalCustomers,
-      totalProducts,
-      totalChallans,
-      totalInventoryItems:
-        totalInventoryItems._sum.currentStock ?? 0,
+      summary: {
+        totalCustomers,
+        totalProducts,
+        totalChallans,
+        totalInventoryItems:
+          totalInventoryItems._sum.currentStock ?? 0,
+      },
+
+      inventory: {
+        stockIn:
+          stockIn._sum.quantity ?? 0,
+
+        stockOut:
+          stockOut._sum.quantity ?? 0,
+      },
+
+      lowStockProducts,
+
+      recentChallans,
     };
   }
 
@@ -58,7 +136,8 @@ class DashboardRepository {
 
     return products.filter(
       (product) =>
-        product.currentStock <= product.minimumStock
+        product.currentStock <=
+        product.minimumStock
     );
   }
 
@@ -80,29 +159,33 @@ class DashboardRepository {
   }
 
   async getInventoryStats() {
-    const [stockIn, stockOut] = await prisma.$transaction([
-      prisma.stockLog.aggregate({
-        where: {
-          movement: MovementType.IN,
-        },
-        _sum: {
-          quantity: true,
-        },
-      }),
+    const [stockIn, stockOut] =
+      await prisma.$transaction([
+        prisma.stockLog.aggregate({
+          where: {
+            movement: MovementType.IN,
+          },
+          _sum: {
+            quantity: true,
+          },
+        }),
 
-      prisma.stockLog.aggregate({
-        where: {
-          movement: MovementType.OUT,
-        },
-        _sum: {
-          quantity: true,
-        },
-      }),
-    ]);
+        prisma.stockLog.aggregate({
+          where: {
+            movement: MovementType.OUT,
+          },
+          _sum: {
+            quantity: true,
+          },
+        }),
+      ]);
 
     return {
-      stockIn: stockIn._sum.quantity ?? 0,
-      stockOut: stockOut._sum.quantity ?? 0,
+      stockIn:
+        stockIn._sum.quantity ?? 0,
+
+      stockOut:
+        stockOut._sum.quantity ?? 0,
     };
   }
 }

@@ -1,3 +1,5 @@
+import { env } from "./config/env";
+
 import express from "express";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
@@ -8,7 +10,32 @@ import { errorHandler } from "./middleware/error.middleware";
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  env.FRONTEND_URL,
+  "http://localhost:5173",
+  "http://localhost:4173",
+].filter(
+  (origin): origin is string => Boolean(origin)
+);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        allowedOrigins.includes(origin)
+      ) {
+        callback(null, true);
+      } else {
+        callback(
+          new Error("Not allowed by CORS")
+        );
+      }
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 app.use(
@@ -19,7 +46,6 @@ app.use(
 
 app.use("/api", routes);
 
-// 404 Handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -27,7 +53,6 @@ app.use((req, res) => {
   });
 });
 
-// Global Error Handler
 app.use(errorHandler);
 
 export default app;

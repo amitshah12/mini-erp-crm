@@ -49,13 +49,18 @@ class InventoryRepository {
   ) {
     const where: Prisma.StockLogWhereInput = {};
 
-    if (productId) where.productId = productId;
+    if (productId) {
+      where.productId = productId;
+    }
 
-    if (movement) where.movement = movement;
+    if (movement) {
+      where.movement = movement;
+    }
 
-    const [logs, total] = await prisma.$transaction([
+    const [items, total] = await prisma.$transaction([
       prisma.stockLog.findMany({
         where,
+
         include: {
           product: {
             select: {
@@ -64,6 +69,7 @@ class InventoryRepository {
               sku: true,
             },
           },
+
           createdBy: {
             select: {
               id: true,
@@ -72,16 +78,31 @@ class InventoryRepository {
             },
           },
         },
+
         orderBy: {
           createdAt: "desc",
         },
+
         skip: (page - 1) * limit,
+
         take: limit,
       }),
-      prisma.stockLog.count({ where }),
+
+      prisma.stockLog.count({
+        where,
+      }),
     ]);
 
-    return { logs, total };
+    return {
+      items,
+
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }
 

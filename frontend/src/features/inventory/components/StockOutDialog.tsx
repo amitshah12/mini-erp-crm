@@ -13,13 +13,9 @@ import { Input } from "@/components/ui/input";
 
 import type { Product } from "@/features/product/types";
 
-import {
-  useStockOut,
-} from "../hooks/useInventoryMutations";
+import { useStockOut } from "../hooks/useInventoryMutations";
 
-import type {
-  StockMovementRequest,
-} from "../types";
+import type { StockMovementRequest } from "../types";
 
 interface Props {
   open: boolean;
@@ -61,7 +57,7 @@ export default function StockOutDialog({
       stockOut.reset();
       onOpenChange(false);
     }
-  }, [stockOut, onOpenChange]);
+  }, [stockOut.isSuccess, stockOut.reset, onOpenChange]);
 
   if (!product) return null;
 
@@ -125,6 +121,7 @@ export default function StockOutDialog({
           </div>
 
           <Button
+            type="submit"
             variant="destructive"
             className="w-full"
             disabled={stockOut.isPending}

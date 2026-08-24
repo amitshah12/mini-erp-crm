@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { getStockHistory } from "../api/inventory.api";
+
 import type { MovementType } from "../types";
 
 export function useStockHistory(

@@ -13,13 +13,9 @@ import { Input } from "@/components/ui/input";
 
 import type { Product } from "@/features/product/types";
 
-import {
-  useStockIn,
-} from "../hooks/useInventoryMutations";
+import { useStockIn } from "../hooks/useInventoryMutations";
 
-import type {
-  StockMovementRequest,
-} from "../types";
+import type { StockMovementRequest } from "../types";
 
 interface Props {
   open: boolean;
@@ -61,7 +57,7 @@ export default function StockInDialog({
       stockIn.reset();
       onOpenChange(false);
     }
-  }, [stockIn, onOpenChange]);
+  }, [stockIn.isSuccess, stockIn.reset, onOpenChange]);
 
   if (!product) return null;
 
@@ -125,6 +121,7 @@ export default function StockInDialog({
           </div>
 
           <Button
+            type="submit"
             className="w-full"
             disabled={stockIn.isPending}
           >

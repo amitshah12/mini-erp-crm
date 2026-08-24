@@ -140,6 +140,7 @@ class ChallanService {
     return challanRepository.findAll(
       query.page,
       query.limit,
+      query.search,
       query.customerId,
       query.status
     );

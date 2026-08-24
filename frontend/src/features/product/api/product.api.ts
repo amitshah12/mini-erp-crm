@@ -3,12 +3,22 @@ import type { Product, ProductsResponse } from "../types";
 
 export async function getProducts(
   page = 1,
-  limit = 10
+  limit = 10,
+  search?: string,
+  category?:
+    | "ELECTRONICS"
+    | "GROCERY"
+    | "STATIONERY"
+    | "CLOTHING"
+    | "MEDICAL"
+    | "OTHER"
 ): Promise<ProductsResponse> {
   const { data } = await api.get("/products", {
     params: {
       page,
       limit,
+      search,
+      category,
     },
   });
 
@@ -21,20 +31,20 @@ export interface CreateProductRequest {
   barcode?: string;
 
   category:
-    | "ELECTRONICS"
-    | "GROCERY"
-    | "STATIONERY"
-    | "CLOTHING"
-    | "MEDICAL"
-    | "OTHER";
+  | "ELECTRONICS"
+  | "GROCERY"
+  | "STATIONERY"
+  | "CLOTHING"
+  | "MEDICAL"
+  | "OTHER";
 
   brand: string;
 
   unit:
-    | "PIECE"
-    | "BOX"
-    | "KG"
-    | "LITER";
+  | "PIECE"
+  | "BOX"
+  | "KG"
+  | "LITER";
 
   purchasePrice: number;
   sellingPrice: number;
@@ -60,7 +70,7 @@ export async function createProduct(
 }
 
 export interface UpdateProductRequest
-  extends Partial<CreateProductRequest> {}
+  extends Partial<CreateProductRequest> { }
 
 export interface UpdateProductResponse {
   success: boolean;

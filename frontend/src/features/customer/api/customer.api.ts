@@ -4,12 +4,18 @@ import type { Customer } from "../types";
 
 export async function getCustomers(
   page = 1,
-  limit = 10
+  limit = 10,
+  search?: string,
+  status?: "LEAD" | "ACTIVE" | "INACTIVE",
+  customerType?: "RETAIL" | "WHOLESALE" | "DISTRIBUTOR"
 ): Promise<CustomersResponse> {
   const { data } = await api.get("/customers", {
     params: {
       page,
       limit,
+      search,
+      status,
+      customerType,
     },
   });
 

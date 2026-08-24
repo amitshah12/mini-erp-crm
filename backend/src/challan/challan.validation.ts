@@ -27,6 +27,8 @@ export const listChallanSchema = z.object({
 
   limit: z.coerce.number().int().positive().max(100).default(10),
 
+  search: z.string().trim().optional(),
+
   customerId: z.string().cuid().optional(),
 
   status: z.nativeEnum(ChallanStatus).optional(),
