@@ -11,6 +11,19 @@ The application is built using **React, TypeScript, Node.js, Express, Prisma, Po
 **Live Application:**  
 http://65.2.81.78
 
+### 🔑 Demo Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| **ADMIN** | `admin@minierp.com` | `Password@123` |
+| **SALES** | `sales@minierp.com` | `Password@123` |
+| **WAREHOUSE** | `warehouse@minierp.com` | `Password@123` |
+| **ACCOUNTS** | `accounts@minierp.com` | `Password@123` |
+
+Use the different accounts to explore the application's **Role-Based Access Control (RBAC)**.
+
+> **Demo environment:** These credentials are intentionally provided for educational/testing purposes. Do not reuse this password for any personal or production account.
+
 > The application is currently deployed using an AWS EC2 public IP. HTTPS/domain configuration is intentionally not included in the current deployment.
 
 ---
