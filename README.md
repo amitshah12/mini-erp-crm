@@ -1,4 +1,3 @@
-```markdown
 # Mini ERP & CRM
 
 A full-stack **Enterprise Resource Planning (ERP) and Customer Relationship Management (CRM)** application designed to manage customers, products, inventory, and sales challans with secure authentication and role-based access control.
